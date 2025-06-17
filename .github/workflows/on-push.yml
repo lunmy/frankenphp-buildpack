@@ -19,10 +19,10 @@ jobs:
         id: build_image
         run: |
           # Construit l'image Docker, en se concentrant sur l'étape 'franken-builder'
-          #docker build --target builder --build-arg PHP_VERSION=${{ env.PHP_VERSION }} -t frankenphp-builder .
+          docker build --target builder --build-arg PHP_VERSION=${{ env.PHP_VERSION }} -t frankenphp-builder .
           
           # Crée un conteneur temporaire à partir de l'image construite
-          #CONTAINER_ID=$(docker create frankenphp-builder)
+          CONTAINER_ID=$(docker create frankenphp-builder)
           
           # Copie le binaire depuis le conteneur vers le runner
           docker cp $CONTAINER_ID:/usr/local/bin/frankenphp ./frankenphp
