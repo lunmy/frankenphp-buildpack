@@ -45,6 +45,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./frankenphp
           asset_name: frankenphp
-          tag: ${{ github.ref }}
+          tag: main-${{ github.sha }}  # Utilise le hash du commit
           overwrite: true
-          body: "frankenphp"
+          body: "FrankenPHP binary built from commit ${{ github.sha }}"
+          release_name: "Build ${{ github.sha }}"
