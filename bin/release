@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# bin/release
+
+BUILD_DIR=$1 # Le répertoire du slug
+
+# Si l'application n'a PAS de Procfile, créez-en un par défaut.
+if [ ! -f "${BUILD_DIR}/Procfile" ]; then
+  echo "web: /app/bin/frankenphp run -c /app/Caddyfile" > "${BUILD_DIR}/Procfile"
+  echo "NOTICE: No Procfile found, using default 'web: /app/bin/frankenphp run -c /app/Caddyfile'." >&2
+fi
+
+# Le reste du JSON de release
+cat <<EOF
+{
+  "addons": [],
+  "config_vars": {},
+  "default_process_types": {
+    "web": "frankenphp run -c ${BUILD_DIR}/Caddyfile"
+  }
+}
+EOF

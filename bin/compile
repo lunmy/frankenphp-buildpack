@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# bin/compile
+
+BUILD_DIR=$1
+
+# Exemple pour télécharger depuis une GitHub Release
+FRANKENPHP_VERSION="v1.0.0-rc.2" # La version de votre release
+# Adaptez l'URL pour pointer vers le fichier attaché à votre release GitHub
+FRANKENPHP_URL="https://github.com/lunmy/frankenphp-buildpack/releases/download/main/frankenphp"
+
+echo "--- Downloading FrankenPHP with Souin ---"
+curl -sSL "$FRANKENPHP_URL" -o "${BUILD_DIR}/bin/frankenphp"
+chmod +x "${BUILD_DIR}/bin/frankenphp"
+
+echo "FrankenPHP with Souin installed to ${BUILD_DIR}/bin/frankenphp"
