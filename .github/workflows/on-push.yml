@@ -30,6 +30,14 @@ jobs:
           name: frankenphp-binary
           path: ./frankenphp
 
+      - name: Delete old release
+        uses: dev-drprasad/delete-tag-and-release@v1
+        with:
+          delete_tag: true
+          tag_name: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -50,4 +58,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./frankenphp
           asset_name: frankenphp
-          asset_content_type: application/octet-stream
+
