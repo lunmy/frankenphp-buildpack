@@ -16,8 +16,17 @@ echo "--- Downloading FrankenPHP with Souin ---"
 curl -sSL "$FRANKENPHP_URL" -o "${BUILD_DIR}/bin/frankenphp"
 chmod +x "${BUILD_DIR}/bin/frankenphp"
 
-# Écrire dans le fichier export du buildpack
-echo "export PATH=\"\$PATH:${BUILD_DIR}/bin:${BUILD_DIR}/vendor/bin\"" >> "${BP_DIR}/export"
+mkdir -p "${BUILD_DIR}/.profile.d"
+# Nom du script de profil pour ce buildpack
+PROFILE_SCRIPT="${BUILD_DIR}/.profile.d/frankenphp.sh"
+
+# Ajoutez /app/bin et /app/vendor/bin au PATH
+echo "export PATH=\"${BUILD_DIR}/bin:${BUILD_DIR}/vendor/bin:\$PATH\"" >> "${PROFILE_SCRIPT}"
+
+# Ajoutez le répertoire des bibliothèques PHP du buildpack officiel au LD_LIBRARY_PATH
+# Ce chemin est standard pour le buildpack PHP de Heroku
+echo "export LD_LIBRARY_PATH=\"/app/.heroku/php/lib:\$LD_LIBRARY_PATH\"" >> "${PROFILE_SCRIPT}"
+# -----------------------------------------------------------------
 
 echo "Added ${BUILD_DIR}/bin to PATH for runtime."
 echo "FrankenPHP with Souin installed to ${BUILD_DIR}/bin/frankenphp"
