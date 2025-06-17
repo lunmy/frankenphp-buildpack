@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: 8.3
+      # Définissez le nom du tag de votre release ici, par exemple 'latest'
+      RELEASE_TAG: main # Ou 'latest' si vous préférez un tag plus générique pour la dernière build
+      RELEASE_NAME: Latest Main Build
+      ASSET_NAME: frankenphp # Nom de l'asset à uploader
+      ASSET_PATH: ./frankenphp # Chemin local de l'asset
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,42 +26,19 @@ jobs:
         run: |
           docker build --target builder --build-arg PHP_VERSION=${{ env.PHP_VERSION }} -t frankenphp-builder .
           CONTAINER_ID=$(docker create frankenphp-builder)
-          docker cp $CONTAINER_ID:/usr/local/bin/frankenphp ./frankenphp
+          docker cp $CONTAINER_ID:/usr/local/bin/frankenphp ${{ env.ASSET_PATH }}
           docker rm $CONTAINER_ID
-          chmod +x ./frankenphp
+          chmod +x ${{ env.ASSET_PATH }}
 
-      - name: Upload FrankenPHP binary as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frankenphp-binary
-          path: ./frankenphp
-
-      - name: Delete old release
-        uses: dev-drprasad/delete-tag-and-release@v1
-        with:
-          delete_tag: true
-          tag_name: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create or Update Release and Upload Asset
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: main
-          release_name: Latest Main Build
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_NAME }}
           body: FrankenPHP binary built from main branch
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./frankenphp
-          asset_name: frankenphp
-
+          files: ${{ env.ASSET_PATH }} # Spécifiez le chemin de l'asset à uploader
+          overwrite: true # Cette option est cruciale pour remplacer les assets existants
