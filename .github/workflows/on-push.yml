@@ -18,19 +18,10 @@ jobs:
       - name: Build FrankenPHP Docker image
         id: build_image
         run: |
-          # Construit l'image Docker, en se concentrant sur l'étape 'franken-builder'
           docker build --target builder --build-arg PHP_VERSION=${{ env.PHP_VERSION }} -t frankenphp-builder .
-          
-          # Crée un conteneur temporaire à partir de l'image construite
           CONTAINER_ID=$(docker create frankenphp-builder)
-          
-          # Copie le binaire depuis le conteneur vers le runner
           docker cp $CONTAINER_ID:/usr/local/bin/frankenphp ./frankenphp
-          
-          # Supprime le conteneur temporaire
           docker rm $CONTAINER_ID
-          
-          # Rend le binaire exécutable (important pour la prochaine étape)
           chmod +x ./frankenphp
 
       - name: Upload FrankenPHP binary as an artifact
@@ -39,13 +30,24 @@ jobs:
           name: frankenphp-binary
           path: ./frankenphp
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./frankenphp
+          tag_name: main
+          release_name: Latest Main Build
+          body: FrankenPHP binary built from main branch
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./frankenphp
           asset_name: frankenphp
-          tag: main-${{ github.sha }}  # Utilise le hash du commit
-          overwrite: true
-          body: "FrankenPHP binary built from commit ${{ github.sha }}"
-          release_name: "Build ${{ github.sha }}"
+          asset_content_type: application/octet-stream
