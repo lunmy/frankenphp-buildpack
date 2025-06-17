@@ -10,7 +10,7 @@ mkdir -p "${BUILD_DIR}/bin"
 
 # Exemple pour télécharger depuis une GitHub Release
 FRANKENPHP_VERSION="v1.0.0-rc.2"
-FRANKENPHP_URL="https://github.com/lunmy/frankenphp-buildpack/releases/download/main-latest/frankenphp"
+FRANKENPHP_URL="https://github.com/lunmy/frankenphp-buildpack/releases/download/main/frankenphp"
 
 echo "--- Downloading FrankenPHP with Souin ---"
 curl -sSL "$FRANKENPHP_URL" -o "${BUILD_DIR}/bin/frankenphp"
