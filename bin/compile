@@ -2,18 +2,22 @@
 # bin/compile
 
 BUILD_DIR=$1
+CACHE_DIR=$2
+BP_DIR=$(cd $(dirname $0); cd ..; pwd)
+
+# Créer le répertoire bin s'il n'existe pas
+mkdir -p "${BUILD_DIR}/bin"
 
 # Exemple pour télécharger depuis une GitHub Release
-FRANKENPHP_VERSION="v1.0.0-rc.2" # La version de votre release
-# Adaptez l'URL pour pointer vers le fichier attaché à votre release GitHub
+FRANKENPHP_VERSION="v1.0.0-rc.2"
 FRANKENPHP_URL="https://github.com/lunmy/frankenphp-buildpack/releases/download/main/frankenphp"
 
 echo "--- Downloading FrankenPHP with Souin ---"
 curl -sSL "$FRANKENPHP_URL" -o "${BUILD_DIR}/bin/frankenphp"
 chmod +x "${BUILD_DIR}/bin/frankenphp"
 
-echo "export PATH=\"${BUILD_DIR}/bin:${BUILD_DIR}/vendor/bin:\$PATH\"" >> "$bp_dir/export"
+# Écrire dans le fichier export du buildpack
+echo "export PATH=\"\$PATH:${BUILD_DIR}/bin:${BUILD_DIR}/vendor/bin\"" >> "${BP_DIR}/export"
 
-# Optionnel: Ajoutez un message de log pour vérifier
 echo "Added ${BUILD_DIR}/bin to PATH for runtime."
 echo "FrankenPHP with Souin installed to ${BUILD_DIR}/bin/frankenphp"
