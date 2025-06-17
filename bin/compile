@@ -12,4 +12,8 @@ echo "--- Downloading FrankenPHP with Souin ---"
 curl -sSL "$FRANKENPHP_URL" -o "${BUILD_DIR}/bin/frankenphp"
 chmod +x "${BUILD_DIR}/bin/frankenphp"
 
+echo "export PATH=\"${BUILD_DIR}/bin:${BUILD_DIR}/vendor/bin:\$PATH\"" >> "$bp_dir/export"
+
+# Optionnel: Ajoutez un message de log pour vérifier
+echo "Added ${BUILD_DIR}/bin to PATH for runtime."
 echo "FrankenPHP with Souin installed to ${BUILD_DIR}/bin/frankenphp"
