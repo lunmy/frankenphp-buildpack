@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: 8.3
-      BIN_NAME: frankenphp
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,32 +25,28 @@ jobs:
           CONTAINER_ID=$(docker create frankenphp-builder)
           
           # Copie le binaire depuis le conteneur vers le runner
-          docker cp $CONTAINER_ID:/usr/local/bin/frankenphp ./{{ env.BIN_NAME }}
+          docker cp $CONTAINER_ID:/usr/local/bin/frankenphp ./frankenphp
           
           # Supprime le conteneur temporaire
           docker rm $CONTAINER_ID
           
           # Rend le binaire exécutable (important pour la prochaine étape)
-          chmod +x ./{{ env.BIN_NAME }}
+          chmod +x ./frankenphp
 
       - name: Upload FrankenPHP binary as an artifact
         uses: actions/upload-artifact@v4
         with:
           name: frankenphp-binary
-          path: ./{{ env.BIN_NAME }}
-          # Optionnel: définir une expiration si vous ne voulez pas les garder indéfiniment
-          # retention-days: 7
+          path: ./frankenphp
 
       - name: Create GitHub Release (or push to S3/GCS)
-        # Cette étape dépendra de l'endroit où vous voulez stocker le binaire
-        # Pour une release GitHub:
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') # Déclenche une release uniquement sur les tags
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ./{{ env.BIN_NAME }}
+          files: ./frankenphp
           name: FrankenPHP with Souin ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
-          draft: false # Optionnel: crée un brouillon de release
+          draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token fourni automatiquement par GitHub Actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
